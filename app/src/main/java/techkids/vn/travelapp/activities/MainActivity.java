@@ -5,6 +5,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
@@ -24,8 +25,16 @@ import org.json.JSONObject;
 
 import java.util.Arrays;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 import techkids.vn.travelapp.R;
 import techkids.vn.travelapp.models.ProfileModel;
+import techkids.vn.travelapp.networks.JSONSeverModel.JSONRequestModel;
+import techkids.vn.travelapp.networks.JSONSeverModel.JSONResponseModel;
+import techkids.vn.travelapp.networks.PutIDService;
 
 public class MainActivity extends AppCompatActivity {
     private ProfileModel profileModel = new ProfileModel();
@@ -38,8 +47,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        this.khaibao();
-        this.loginButtonOnClick();
+        khaibao();
+        loginButtonOnClick();
+
     }
 
     @Override
@@ -66,7 +76,22 @@ public class MainActivity extends AppCompatActivity {
                             profileModel.setId(object.getString("id"));
                             profileModel.setMail(object.getString("email"));
                             profileModel.setName(object.getString("name"));
+                            Retrofit retrofit = new Retrofit.Builder()
+                                    .baseUrl("https://diphuot.herokuapp.com/api/")
+                                    .addConverterFactory(GsonConverterFactory.create()).build();
+                            PutIDService putIDService = retrofit.create(PutIDService.class);
+                            Log.d(TAG," "+profileModel.getId());
+                            putIDService.putID(new JSONRequestModel(profileModel.getId()))
+                                    .enqueue(new Callback<JSONResponseModel>() {
+                                        @Override
+                                        public void onResponse(Call<JSONResponseModel> call, Response<JSONResponseModel> response) {
 
+                                        }
+                                        @Override
+                                        public void onFailure(Call<JSONResponseModel> call, Throwable t) {
+
+                                        }
+                                    });
                             EventBus.getDefault().postSticky(profileModel); //Chuyển dữ liệu profile sang Home Screen Activity
                             Intent myIntent = new Intent(MainActivity.this, HomeScreenActivity.class);
                             startActivity(myIntent);
