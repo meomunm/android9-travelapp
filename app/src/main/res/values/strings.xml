@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">TravelApp</string>
+    <string name="facebook_app_id">270756706741663</string>
+    <string name="fb_login_protocol_scheme">fb270756706741663</string>
 </resources>
